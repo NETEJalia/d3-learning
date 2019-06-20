@@ -26,6 +26,8 @@ $(document).ready(function () {
         shape,
         rank,
         arr,
+        chairArr = [],
+        profArr = [],
         facultyArr = [],
         circleArr = [],
         diamondArr = [];
@@ -34,58 +36,92 @@ $(document).ready(function () {
         data = await d3.json("data.json");
     };
 
-    function yearSelector (datapoint, chosenYear) {
+    function yearSelector (datapoint, chosenYear, filterDegree) {
         if (chosenYear) {
             if (chosenYear === datapoint.academicYear) {
-                jobSelector(datapoint, faculty);
+                // console.log(datapoint.faculty);
+                jobSelector(datapoint, faculty, filterDegree);
             }
         } else {
+            // chairArr.push()
+            console.log(faculty[0].chair);
         }
     }
 
-    function jobSelector (datapoint, faculty, job) {
-        faculty.forEach(function (job) {
+    function jobSelector (datapoint, faculty, filterDegree) {
+        faculty.forEach(function (job, filterDegree) {
             if (job.chair) {
                 rank = 'chair';
                 shape = 'circle';
                 job.chair.forEach(function (degree) {
-                    degreeSelector(degree, rank);
+                    degreeSelector(degree, rank, filterDegree);
+                    chairArr.push(facultyArr);
                 })
             } else if (job.professor) {
                 rank = 'professor';
                 shape = 'diamond';
                 job.professor.forEach(function (degree) {
-                    degreeSelector(degree, rank);
+                    degreeSelector(degree, rank, filterDegree);
+                    if (filterDegree === 'PHD') {
+                        profArr.push(facultyArr);
+                    }
+                    profArr.push(facultyArr);
                 })
             }
         })
     }
 
     function degreeSelector (degree, rank) {
+        facultyArr = [];
+        if (filterDegree) {
+            if (degree.hasOwnProperty(filterDegree)) {
+                if (degree.mdPHD) {
+                    degree.mdPHD.forEach(function (person) {
+                    facultyArr.push(person); 
+                });
+                    console.log(filterDegree + " = filter");
+                }
+                if (degree.MD) {
+                    degree.MD.forEach(function (person) {
+                        facultyArr.push(person);
+                    });
+                    console.log(filterDegree + " = filter");
+                }
+                if (degree.PHD) {
+                    degree.PHD.forEach(function (person) {
+                        facultyArr.push(person);
+                    });
+                    console.log(filterDegree + " = filter");
+                }
+                return facultyArr;
+            } 
+        } else {
+            if (degree.mdPHD) {
+                degree.mdPHD.forEach(function (person) {
+                    facultyArr.push(person);
+                })
+            } else if (degree.MD) {
+                degree.MD.forEach(function(person) {
+                    facultyArr.push(person);
+                })
+            } else if (degree.PHD) {
+                degree.PHD.forEach(function (person) {
+                    facultyArr.push(person);
+                })
+            }
+        }
+        
         if (rank === 'chair') {
             arr = circleArr;
         } else if (rank === 'professor') {
             arr = diamondArr;
-        }
-
-        if (degree.mdPHD) {
-            degree.mdPHD.forEach(function (person) {
-                arr.push(person);
-            })
-        } else if (degree.MD) {
-            degree.MD.forEach(function(person) {
-                arr.push(person);
-            })
-        } else if (degree.PHD) {
-            degree.PHD.forEach(function (person) {
-                arr.push(person);
-            })
         }
     }
 
     getData().then(function () {
         // get list of years
         var academicYears = [],
+            facultyArr = [],
             facultyRank,
             facultyRace,
             facultyFemale,
@@ -98,9 +134,11 @@ $(document).ready(function () {
             year = datapoint.academicYear;
             faculty = datapoint.faculty;
             
+            filterDegree = 'PHD';
             chosenYear = 1900;
-            yearSelector(datapoint, chosenYear);
-            // filterYear = 1920;;
+            yearSelector(datapoint, chosenYear, filterDegree);
+            console.log(chairArr);
+            console.log(profArr);
             // if (filterYear === year) {
             //     yearSelector(item, year, faculty);
             // } else {
